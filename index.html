@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>İngilizce Kelime Pratik</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary shadow-sm">
+    <div class="container-fluid">
+        <a class="navbar-brand fw-bold" href="#">Kelime Ustası</a>
+
+        <div class="ms-auto d-flex align-items-center gap-2">
+            <button
+                class="btn btn-icon-circle btn-outline-light border-0"
+                id="notesNavBtn"
+                title="Kişisel Notlar"
+                type="button"
+                data-bs-toggle="offcanvas"
+                data-bs-target="#personalNotesOffcanvas"
+                aria-controls="personalNotesOffcanvas">
+                📝
+            </button>
+        </div>
+    </div>
+    </nav>
+
+    <div class="offcanvas offcanvas-end" tabindex="-1" id="personalNotesOffcanvas" aria-labelledby="personalNotesOffcanvasLabel">
+        <div class="offcanvas-header">
+            <h5 class="offcanvas-title" id="personalNotesOffcanvasLabel">Özel Notlarım</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Kapat"></button>
+        </div>
+        <div class="offcanvas-body d-flex flex-column">
+            <div class="mb-2 small text-muted">Bu alan sadece bu cihazda saklanan, kişisel çalışma notların içindir.</div>
+            <textarea id="personalNotesTextarea" class="form-control flex-grow-1 mb-2" placeholder="Bugünkü hedeflerin, tekrar etmen gereken kelimeler, cümleler..." style="min-height: 200px;"></textarea>
+            <div class="d-flex justify-content-between align-items-center mt-1 small">
+                <span id="personalNotesStatus" class="text-muted">Kaydedilmedi.</span>
+                <button type="button" id="personalNotesSaveBtn" class="btn btn-sm btn-primary">Notları Kaydet</button>
+            </div>
+        </div>
+    </div>
+
+    <main class="container my-4">
+        <div class="row g-4 mb-3">
+            <div class="col-12">
+                <div class="card shadow-sm">
+                    <div class="card-body d-flex flex-column flex-lg-row align-items-lg-center justify-content-between gap-3">
+                        <div>
+                            <h1 class="h3 mb-1">Kendi kelime dünyanı inşa et</h1>
+                            <p class="text-muted mb-2 small">Kelime Ustası, tamamen sana ait bir İngilizce kelime çalışma alanı. Kendi kelimelerini ekle, zayıf noktalarını gör, her gün kısa pratiklerle seviyeni yükselt.</p>
+                            <div class="d-flex flex-wrap gap-2 small">
+                                <span class="badge bg-success-subtle text-success border border-success-subtle">Spaced practice mantığı</span>
+                                <span class="badge bg-info-subtle text-info border border-info-subtle">Zayıf kelimeleri hedef alma</span>
+                                <span class="badge bg-warning-subtle text-warning border border-warning-subtle">Günlük streak takibi</span>
+                            </div>
+                        </div>
+                        <div class="text-lg-end small">
+                            <div class="streak-pill mb-1" id="streakPill">
+                                <span>🔥 Seri:</span>
+                                <strong><span id="streakCurrent">0</span> gün</strong>
+                            </div>
+                            <div class="streak-badge-small text-muted">En iyi serin: <span id="streakBest">0</span> gün</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row g-4">
+            <!-- SOL BLOK: Kelime ekleme ve liste -->
+            <div class="col-lg-5">
+                <div class="card shadow-sm mb-4">
+                    <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+                        <h5 class="mb-0">Yeni Kelime Ekle</h5>
+                        <span class="small opacity-75">Dinleme ve yazma odaklı çalışma</span>
+                    </div>
+                    <div class="card-body">
+                        <form id="wordForm">
+                            <div class="mb-3">
+                                <label for="english" class="form-label">İngilizce Kelime</label>
+                                <input type="text" id="english" class="form-control" placeholder="ör: achieve" required />
+                            </div>
+                            <div class="mb-3">
+                                <label for="turkish" class="form-label">Türkçe Anlam</label>
+                                <input type="text" id="turkish" class="form-control" placeholder="ör: başarmak" required />
+                            </div>
+                            <div class="mb-3">
+                                <label for="wordTags" class="form-label">Etiketler (virgülle ayır)</label>
+                                <input type="text" id="wordTags" class="form-control" placeholder="ör: iş, günlük, seyahat" />
+                            </div>
+                            <div class="mb-3">
+                                <label for="example" class="form-label">Örnek Cümle (İngilizce) - İsteğe Bağlı</label>
+                                <textarea id="example" rows="2" class="form-control" placeholder="I want to achieve my goals."></textarea>
+                            </div>
+                            <button type="submit" class="btn btn-primary w-100">Kelimeyi Kaydet</button>
+                        </form>
+                    </div>
+                </div>
+
+                <div class="card shadow-sm">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <h5 class="mb-0">Kelime Listem</h5>
+                        <span class="badge bg-secondary" id="wordCountBadge">0 kelime</span>
+                    </div>
+                    <div class="card-body">
+                        <div class="row g-2 mb-3 small">
+                            <div class="col-12 col-md-6">
+                                <input type="text" id="searchInput" class="form-control form-control-sm" placeholder="Kelime ara (EN/TR)" />
+                            </div>
+                            <div class="col-6 col-md-3">
+                                <select id="searchLang" class="form-select form-select-sm">
+                                    <option value="all">EN + TR</option>
+                                    <option value="en">Sadece İngilizce</option>
+                                    <option value="tr">Sadece Türkçe</option>
+                                </select>
+                            </div>
+                            <div class="col-6 col-md-3">
+                                <select id="filterStrength" class="form-select form-select-sm">
+                                    <option value="all">Tüm kelimeler</option>
+                                    <option value="weak20">En zayıf 20</option>
+                                    <option value="newest">En yeni kelimeler</option>
+                                    <option value="strong">En iyi bildiklerim</option>
+                                </select>
+                            </div>
+                            <div class="col-12 mt-1">
+                                <select id="tagFilter" class="form-select form-select-sm">
+                                    <option value="all">Tüm etiketler</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="word-list" id="wordList">
+                            <p class="text-muted mb-0 small">Henüz kelime eklemedin. Üstteki formdan başlayabilirsin.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- SAĞ BLOK: Günün kelimesi, pratik ve istatistik -->
+            <div class="col-lg-7">
+                <div class="row g-4">
+                    <div class="col-12">
+                        <div class="card shadow-sm daily-word-card">
+                            <div class="card-header d-flex justify-content-between align-items-center daily-word-header">
+                                <div class="d-flex align-items-center gap-2">
+                                    <div class="daily-word-icon">🔮</div>
+                                    <h5 class="mb-0">Günün Kelimesi</h5>
+                                </div>
+                                <div class="d-flex gap-2 align-items-center">
+                                    <button class="btn btn-icon-circle btn-outline-light border-0" id="dailySpeakBtn" title="Telaffuzu dinle">🔊</button>
+                                    <button class="btn btn-sm btn-outline-primary" id="newDailyWordBtn">Yenile</button>
+                                </div>
+                            </div>
+                            <div class="card-body" id="dailyWordArea">
+                                <p class="text-muted mb-0 small">Günün kelimesi için önce birkaç kelime ekle.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                                       <div class="col-12">
+                        <div class="card shadow-sm">
+                            <div class="card-header d-flex flex-wrap gap-2 justify-content-between align-items-center">
+                                <h5 class="mb-0">Oxford Seviye Kelimeleri</h5>
+                            </div>
+                            <div class="card-body small">
+                                <div class="mb-2">Oxford kelime listelerine bakabilirsiniz...</div>
+                                <div class="d-flex flex-wrap gap-2 mb-3" id="oxfordLevelButtons">
+                                    <button type="button" class="btn btn-outline-light btn-sm oxford-level-btn" data-level="A1">Oxford A1</button>
+                                    <button type="button" class="btn btn-outline-light btn-sm oxford-level-btn" data-level="A2">Oxford A2</button>
+                                    <button type="button" class="btn btn-outline-light btn-sm oxford-level-btn" data-level="B1">Oxford B1</button>
+                                    <button type="button" class="btn btn-outline-light btn-sm oxford-level-btn" data-level="B2">Oxford B2</button>
+                                    <button type="button" class="btn btn-outline-light btn-sm oxford-level-btn" data-level="C1">Oxford C1</button>
+                                </div>
+                                <div class="d-flex flex-wrap gap-2 align-items-center">
+                                    <span id="oxfordSelectedLevelLabel" class="text-muted">Seviye seçilmedi.</span>
+                                    <button type="button" class="btn btn-sm btn-primary ms-auto" id="startOxfordQuizBtn">Bu seviye kelimelerine bak</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-12">
+                        <div class="card shadow-sm">
+                            <div class="card-header d-flex flex-wrap gap-2 justify-content-between align-items-center">
+                                <h5 class="mb-0">Hızlı Pratik / Quiz</h5>
+                                <div class="d-flex flex-wrap gap-2">
+                                    <select id="quizTagFilter" class="form-select form-select-sm w-auto">
+                                        <option value="all">Tüm etiketler</option>
+                                    </select>
+                                    <select id="quizMode" class="form-select form-select-sm w-auto">
+                                        <option value="mixed">Karışık Mod</option>
+                                        <option value="en-to-tr">İngilizce → Türkçe</option>
+                                        <option value="tr-to-en">Türkçe → İngilizce</option>
+                                    </select>
+                                    <div class="form-check form-switch d-flex align-items-center small">
+                                        <input class="form-check-input me-1" type="checkbox" id="quizDictationMode" />
+                                        <label class="form-check-label" for="quizDictationMode">Dinleyip yaz</label>
+                                    </div>
+                                    <button class="btn btn-sm btn-primary" id="startQuizBtn">Başlat</button>
+                                </div>
+                            </div>
+                            <div class="card-body" id="quizArea">
+                                <p class="text-muted mb-0 small">Kelime listesinden rastgele sorular sorulacak. Başlamak için "Başlat"a tıkla.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-12 col-xl-7">
+                        <div class="card shadow-sm">
+                            <div class="card-header d-flex flex-wrap gap-2 justify-content-between align-items-center">
+                                <h5 class="mb-0">Günlük Hedef & İstatistik</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="row g-3 align-items-end mb-3">
+                                    <div class="col-6 col-md-4">
+                                        <label for="dailyMinutes" class="form-label small">Günlük Çalışma Hedefi (dakika)</label>
+                                        <input type="number" id="dailyMinutes" class="form-control" min="5" max="180" step="5" value="20" />
+                                    </div>
+                                    <div class="col-6 col-md-4">
+                                        <button class="btn btn-outline-primary w-100 mt-3 mt-md-0" id="saveDailyTargetBtn">Hedefi Kaydet</button>
+                                    </div>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label class="form-label small mb-1">Bugünkü Çalışma İlerlemen</label>
+                                    <div class="progress" style="height: 22px;">
+                                        <div class="progress-bar" id="dailyProgressBar" role="progressbar" style="width: 0%;">0 / 0 dk</div>
+                                    </div>
+                                    <p class="small text-muted mt-1 mb-0" id="dailyProgressText">Henüz bugün çalışma süresi kaydedilmedi.</p>
+                                </div>
+                                <div class="d-flex flex-wrap gap-3 small mt-3" id="statsArea">
+                                    <span class="badge bg-success-subtle text-success border border-success-subtle">Toplam Kelime: <span id="statTotalWords">0</span></span>
+                                    <span class="badge bg-info-subtle text-info border border-info-subtle">Toplam Doğru Cevap: <span id="statTotalCorrect">0</span></span>
+                                    <span class="badge bg-warning-subtle text-warning border border-warning-subtle">Son 7 Gün Quiz: <span id="statLast7Days">0</span> soru</span>
+                                </div>
+
+                                <hr class="my-3">
+
+                                <div class="row gy-3 small">
+                                    <div class="col-12 col-md-6">
+                                        <div class="mb-1 fw-semibold">Rozetler</div>
+                                        <div class="d-flex flex-wrap gap-2" id="badgeArea">
+                                            <span class="badge badge-locked">Kelime Koleksiyoneri</span>
+                                            <span class="badge badge-locked">Streak Ustası</span>
+                                            <span class="badge badge-locked">Sniper</span>
+                                        </div>
+                                    </div>
+                                    <div class="col-12 col-md-6">
+                                        <div class="mb-1 fw-semibold">Günlük Görevler</div>
+                                        <ul class="list-unstyled mb-0" id="dailyQuests">
+                                            <li class="quest-item" data-quest="questions">
+                                                <span class="quest-label">Bugün 20 soru çöz</span>
+                                                <span class="quest-progress" id="questQuestionsProgress">0 / 20</span>
+                                            </li>
+                                            <li class="quest-item" data-quest="newWords">
+                                                <span class="quest-label">Bugün 5 yeni kelime ekle</span>
+                                                <span class="quest-progress" id="questNewWordsProgress">0 / 5</span>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </div>
+
+                                <div class="mt-3">
+                                    <div class="small mb-1 fw-semibold">Son 7 Gün Doğru Cevaplar</div>
+                                    <div class="sr-chart" id="last7Chart"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-12 col-xl-5">
+                        <div class="card shadow-sm h-100">
+                            <div class="card-header d-flex justify-content-between align-items-center">
+                                <h5 class="mb-0">Zayıf Kelimeler</h5>
+                                <span class="badge bg-danger-subtle text-danger border border-danger-subtle small">Hedef odaklı tekrar</span>
+                            </div>
+                            <div class="card-body small" id="weakWordsList">
+                                <p class="text-muted mb-0">Quiz çözdükçe en çok zorlandığın kelimeler burada görünecek.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer class="text-center text-muted small py-3 border-top">
+        <div class="footer-signature d-inline-flex align-items-center gap-2">
+            <span class="footer-signature-line"></span>
+            <span class="footer-signature-name">Kemal Alper AKDENİZ</span>
+            <span class="footer-signature-line"></span>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="app.js"></script>
+</body>
+</html>
